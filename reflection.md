@@ -1,16 +1,33 @@
 # PawPal+ Project Reflection
 
 ## 1. System Design
-
+This is my first idea for the system design.
+    - Walking
+            > Who is walking the pet
+            > Walking Schedule
+            
+    - Feeding
+            > Feeding Schedule
+            > Who is feeding the pet
+            > Payment
+    - Grooming
+            > Grooming Store
+            > Grooming Appointment
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+The initial design centered on five classes
+
+- **Owner** — represents a pet owner; holds contact info and a list of associated pets.
+- **Pet** — represents an individual animal; stores species, age, and a list of tasks.
+- **Task** — the core unit of work (feeding, walk, grooming,); holds a scheduled time, priority level, category, and recurrence settings.
+- **Scheduler** — stateless utility class containing the algorithmic logic: sorting tasks by priority/time, detecting time conflicts between tasks, and generating future instances of recurring tasks.
+
+
+
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+During implementation, the `Scheduler` was initially conceived as methods spread across the `Pet` class. It was refactored into its own standalone class to keep `Pet` focused purely on data ownership and to make the scheduling logic independently testable. This separation follows the Single Responsibility Principle — `Pet` stores tasks, `Scheduler` reasons about them.
 
 ---
 
