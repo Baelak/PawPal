@@ -15,19 +15,17 @@ This is my first idea for the system design.
             > Grooming Appointment
 **a. Initial design**
 
-The initial design centered on five classes
-
-- **Owner** — represents a pet owner; holds contact info and a list of associated pets.
-- **Pet** — represents an individual animal; stores species, age, and a list of tasks.
-- **Task** — the core unit of work (feeding, walk, grooming,); holds a scheduled time, priority level, category, and recurrence settings.
-- **Scheduler** — stateless utility class containing the algorithmic logic: sorting tasks by priority/time, detecting time conflicts between tasks, and generating future instances of recurring tasks.
-
-
-
+The system is built on six classes. 
+- Task is the simplest — it just holds a task name, how long it takes, and its priority.
+- Pet groups a pet's name and type together with its list of tasks.-
+- Owner stores the owner's name, their preferences, and how much time they have available each day. 
+- Schedule holds the final ordered list of tasks and can produce a readable plan.
+- Scheduler contains the core logic — it takes an owner and a pet and decides which tasks to include and in what order. 
+- PawPalApp is the entry point that wires everything together and launches the app.
 
 **b. Design changes**
 
-During implementation, the `Scheduler` was initially conceived as methods spread across the `Pet` class. It was refactored into its own standalone class to keep `Pet` focused purely on data ownership and to make the scheduling logic independently testable. This separation follows the Single Responsibility Principle — `Pet` stores tasks, `Scheduler` reasons about them.
+Yes, the design changed during implementation. The original Owner class had no link to Pet — ownership was implied but never modeled in code. During review it became clear that without a pets list on Owner, there was no way to retrieve all pets for a given owner or pass them to the scheduler.
 
 ---
 
