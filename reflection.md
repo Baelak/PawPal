@@ -36,10 +36,14 @@ Yes, the design changed during implementation. The original Owner class had no l
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
 - How did you decide which constraints mattered most?
 
+- The scheduler considers two main constraints: the owner's total available time per day and each task's priority level. It sorts tasks by priority first, then fits them into the time budget. Time felt like the most important constraint because no matter how urgent a task is, it can't happen if there's no time. The priority just decides which tasks get the limited slots first.
+
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
+
+- The scheduler uses a greedy approach. It picks the highest priority tasks first and stops when time runs out. The tradeoff is that a short low priority task that would easily fit might get skipped if a long high-priority task consumed most of the budget. This is because missing a high-priority task like medication is worse than skipping a low priority one like play, even if the low priority task would have technically fit.
 
 ---
 

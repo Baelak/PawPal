@@ -6,7 +6,7 @@ You are building **PawPal+**, a Streamlit app that helps a pet owner plan care t
 
 A busy pet owner needs help staying consistent with pet care. They want an assistant that can:
 
-- Track pet care tasks (*walks, *feeding, meds, enrichment, *grooming, etc.)
+- Track pet care tasks (walks, feeding, meds, enrichment, grooming, etc.)
 - Consider constraints (time available, priority, owner preferences)
 - Produce a daily plan and explain why it chose that plan
 
@@ -41,3 +41,17 @@ pip install -r requirements.txt
 5. Add tests to verify key behaviors.
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
+
+## Smarter Scheduling
+
+Beyond basic task tracking, PawPal+ includes several algorithmic features:
+
+- **Priority-first scheduling** > tasks are sorted high → medium → low, then fitted into the owner's available time budget. Higher-priority tasks (medication, feeding) always claim slots before lower-priority ones.
+- **Chronological sorting** > 
+sort_by_time() orders any task list by scheduled_time using numeric minute comparison, so 07:00 always sorts before 10:00 regardless of insertion order.
+- **Conflict detection** >
+ conflict_warnings() scans for overlapping time windows across all pets and returns plain warning strings (no crashes). Two tasks conflict when one starts before the other ends.
+- **Recurring task auto-scheduling** >
+ calling Pet.complete_task() marks a task done and automatically creates the next occurrence: +1 day for daily tasks, +7 days for weekly tasks, always anchored to today so it never schedules into the past.
+- **Skipped task reporting** >
+ the generated Schedule tracks tasks that didn't fit the time budget and lists them separately, so owners know what was left out and why.
