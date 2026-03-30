@@ -54,10 +54,14 @@ Yes, the design changed during implementation. The original Owner class had no l
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
 - What kinds of prompts or questions were most helpful?
 
+I used Claude for UML brainstorming, generating class skeletons, implementing scheduling logic, and writing tests. The most helpful prompts were specific and scoped which accomplishes the task efficiently. such as asking it to review a single method or flag missing relationships. Vague prompts needed more correction and back and forth than focused ones.
+
 **b. Judgment and verification**
 
 - Describe one moment where you did not accept an AI suggestion as-is.
 - How did you evaluate or verify what the AI suggested?
+
+When Claude generated next occurrence, it calculated the next date from the self scheduled date. A task created last week would schedule its follow up relative to that old date which possibly might be still in the past. I caught this by tracing through a manual scenario, then modified the method and verified it with a test.
 
 ---
 
@@ -68,10 +72,14 @@ Yes, the design changed during implementation. The original Owner class had no l
 - What behaviors did you test?
 - Why were these tests important?
 
+I tested task completion status, chronological sorting, recurring task creation (daily,weekly,once), conflict detection, and edge cases. These matter because they cover the three core behaviors the app promises which are scheduling correctly, catching conflicts, and handling recurring tasks without crashing.
+
 **b. Confidence**
 
 - How confident are you that your scheduler works correctly?
 - What edge cases would you test next if you had more time?
+
+I am confident in the core logic as all 13 tests passed. Next I'd test the multi-day chains where a recurring task's follow up also becomes due, and behavior when there is no available time.
 
 ---
 
@@ -81,10 +89,16 @@ Yes, the design changed during implementation. The original Owner class had no l
 
 - What part of this project are you most satisfied with?
 
+The Scheduler class. Having all the scheduling code in one place made it easy to test and easy to use in the app.
+
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
 
+I believe adding a scheduled date filter to generate a plan so it only considers tasks due today. Right now the plan includes any pending task regardless of date, which would cause issues across multiple days of use.
+
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+
+AI is most useful when you already have a clear mental model of what you're building which allows you to be specific. Specific, scoped prompts produce accurate output fast and make the project go faster and smoother. If you know enough to evaluate what the AI produces then it is easier to redirect it when it drifts.

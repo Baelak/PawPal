@@ -1,28 +1,59 @@
 # PawPal+ (Module 2 Project)
 
-You are building **PawPal+**, a Streamlit app that helps a pet owner plan care tasks for their pet.
+**🐾 PawPal+** is a smart pet care management app built with Python and Streamlit. It helps a busy pet owner stay on top of daily routines by scheduling tasks, detecting conflicts, and automatically carrying forward recurring activities.
 
-## Scenario
+---
 
-A busy pet owner needs help staying consistent with pet care. They want an assistant that can:
+## Features
 
-- Track pet care tasks (walks, feeding, meds, enrichment, grooming, etc.)
-- Consider constraints (time available, priority, owner preferences)
-- Produce a daily plan and explain why it chose that plan
+### Owner & Pet Management
+- Register an owner with a name and a daily time budget (in minutes)
+- Add multiple pets per owner (dog, cat, bird, etc.)
+- Tasks are scoped to individual pets but scheduled across all of them together
 
-Your job is to design the system first (UML), then implement the logic in Python, then connect it to the Streamlit UI.
+### Priority-First Scheduling
+- Tasks are ranked **high → medium → low** and fitted greedily into the owner's available time
+- Higher-priority tasks (medication, feeding) always claim a slot before lower-priority ones
+- Tasks that don't fit are tracked as "skipped" with an explanation
 
-## What you will build
+### Chronological Sorting
+- `Scheduler.sort_by_time()` reorders any task list by `HH:MM` start time using numeric comparison — insertion order never affects the output
+- The final generated schedule is always displayed in time order
 
-Your final app should:
+### Conflict Detection
+- `Scheduler.detect_conflicts()` checks every pair of tasks for overlapping windows using: `a.start < b.end AND b.start < a.end`
+- `Scheduler.conflict_warnings()` returns plain warning strings — no crashes, just actionable messages shown directly in the UI
 
-- Let a user enter basic owner + pet info
-- Let a user add/edit tasks (duration + priority at minimum)
-- Generate a daily schedule/plan based on constraints and priorities
-- Display the plan clearly (and ideally explain the reasoning)
-- Include tests for the most important scheduling behaviors
+### Recurring Task Auto-Scheduling
+- Marking a `daily` task complete automatically creates the next occurrence for **tomorrow**
+- Marking a `weekly` task complete creates the next occurrence **7 days from today**
+- Always anchored to `date.today()` so the new task is never scheduled in the past
+- `once` tasks are marked done with no follow-up
 
-## Getting started
+### Skipped Task Reporting
+- The `Schedule` object tracks both planned tasks and tasks that didn't fit the time budget
+- The UI surfaces skipped tasks as individual warnings so owners know exactly what was dropped and why
+
+---
+
+## System Design
+
+The app is built on six classes:
+
+| Class | Role |
+|---|---|
+| `Task` | A single care activity with time, duration, priority, frequency, and completion state |
+| `Pet` | Groups a pet's details with its task list; handles task completion and recurrence |
+| `Owner` | Holds the time budget and a list of pets; aggregates tasks across all pets |
+| `Schedule` | The output of the scheduler — planned tasks + skipped tasks |
+| `Scheduler` | All algorithmic logic: sorting, filtering, conflict detection, plan generation |
+| `PawPalApp` | CLI entry point for running a demo without the Streamlit UI |
+
+See `uml_final.png` for the full class diagram.
+
+---
+
+## Getting Started
 
 ### Setup
 
@@ -32,51 +63,63 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Suggested workflow
+### Run the app
 
-1. Read the scenario carefully and identify requirements and edge cases.
-2. Draft a UML diagram (classes, attributes, methods, relationships).
-3. Convert UML into Python class stubs (no logic yet).
-4. Implement scheduling logic in small increments.
-5. Add tests to verify key behaviors.
-6. Connect your logic to the Streamlit UI in `app.py`.
-7. Refine UML so it matches what you actually built.
+```bash
+streamlit run app.py
+```
+
+### Run the CLI demo
+
+```bash
+python pawpal_system.py
+```
+
+---
+
+## Testing PawPal+
+
+```bash
+python -m pytest tests/test_pawpal.py -v
+```
+
+### What the tests cover
+
+13 tests across five categories:
+
+| Category | Tests | What's verified |
+|---|---|---|
+| **Task completion** | 2 | mark_complete() flips status; adding a task increases pet count |
+| **Sorting** | 2 | Out-of-order tasks return chronologically; same-hour minute edge case |
+| **Recurrence** | 3 | Daily → +1 day; weekly → +7 days; once → no follow-up |
+| **Conflict detection** | 3 | Exact same time flagged; overlapping windows flagged; back-to-back correctly not flagged |
+| **Edge cases** | 3 | Empty pet; owner with no pets; all tasks exceed budget → all skipped |
+
+### Confidence level
+
+★★★★☆ (4 / 5)
+
+Core scheduling logic is fully covered and all 13 tests pass. The remaining star reflects untested areas: Streamlit UI wiring, the expand_recurring helper, and multi-day recurring chains.
+
+---
 
 ## Smarter Scheduling
 
 Beyond basic task tracking, PawPal+ includes several algorithmic features:
 
-- **Priority-first scheduling** > tasks are sorted high → medium → low, then fitted into the owner's available time budget. Higher-priority tasks (medication, feeding) always claim slots before lower-priority ones.
-- **Chronological sorting** > 
-sort_by_time() orders any task list by scheduled_time using numeric minute comparison, so 07:00 always sorts before 10:00 regardless of insertion order.
+- **Priority-first scheduling** >
+tasks are sorted high → medium → low, then fitted into the owner's available time budget
+- **Chronological sorting** >
+sort_by_time() orders any task list by scheduled_time using numeric minute comparison
 - **Conflict detection** >
- conflict_warnings() scans for overlapping time windows across all pets and returns plain warning strings (no crashes). Two tasks conflict when one starts before the other ends.
+conflict_warnings() scans for overlapping time windows and returns plain warning strings
 - **Recurring task auto-scheduling** >
- calling Pet.complete_task() marks a task done and automatically creates the next occurrence: +1 day for daily tasks, +7 days for weekly tasks, always anchored to today so it never schedules into the past.
+Pet.complete_task() marks a task done and creates the next occurrence anchored to today
 - **Skipped task reporting** >
- the generated Schedule tracks tasks that didn't fit the time budget and lists them separately, so owners know what was left out and why.
+Schedule tracks tasks that didn't fit the time budget and lists them separately
 
-## Testing PawPal+
+---
 
-### Run the tests
+## Demo
 
-- python -m pytest tests/test_pawpal.py -v
-
-
-### What the tests cover
-
-13 tests across four categories:
-
-| Category | Tests | What's verified |
-|---|---|---|
-| **Task completion** | 2 | mark_complete() flips status; adding a task increases pet count |
-| **Sorting** | 2 | Out-of-order tasks return in chronological order; same-hour edge case handled correctly |
-| **Recurrence** | 3 | Daily tasks create a +1 day follow-up; weekly creates +7 days; once tasks create nothing |
-| **Conflict detection** | 3 | Exact same start time flagged; overlapping windows flagged; back-to-back tasks correctly not flagged |
-| **Edge cases** | 3 | Empty pet returns no tasks; owner with no pets produces empty schedule; tasks over budget all go to skipped |
-
-### Confidence level
-
-★★★★☆ (4 out of 5 stars)
-
-The core scheduling logic, priority sorting, time-budget fitting, recurring task creation, and conflict detection is fully tested and all 13 tests pass. The one star held back reflects untested areas such as the Streamlit UI wiring, the expand_recurring method, and multi-day scenarios where a recurring task's follow-up itself becomes due.
+<a href="/pawpal_screenshot.jpg/" target="_blank"><img src='/pawpal_screenshot.jpg' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>
