@@ -107,13 +107,13 @@ Core scheduling logic is fully covered and all 13 tests pass. The remaining star
 Beyond basic task tracking, PawPal+ includes several algorithmic features:
 
 - **Priority-first scheduling** >
-tasks are sorted high → medium → low, then fitted into the owner's available time budget
+Tasks are sorted high → medium → low, then fitted into the owner's available time budget
 - **Chronological sorting** >
-sort_by_time() orders any task list by scheduled_time using numeric minute comparison
+*sort_by_time()* orders any task list by scheduled_time using numeric minute comparison
 - **Conflict detection** >
-conflict_warnings() scans for overlapping time windows and returns plain warning strings
+*conflict_warnings()* scans for overlapping time windows and returns plain warning strings
 - **Recurring task auto-scheduling** >
-Pet.complete_task() marks a task done and creates the next occurrence anchored to today
+*Pet.complete_task()* marks a task done and creates the next occurrence anchored to today
 - **Skipped task reporting** >
 Schedule tracks tasks that didn't fit the time budget and lists them separately
 
